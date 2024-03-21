@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .menu {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #333;
+        }
+
+        .menu-item {
+            float: left;
+        }
+
+        .menu-item a, .dropbtn {
+            display: inline-block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+
+        .menu-item a:hover, .dropdown:hover .dropbtn {
+            background-color: red;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<ul class="menu">
+    <li class="menu-item"><a href="#home">Home</a></li>
+    <li class="dropdown menu-item">
+        <a href="javascript:void(0)" class="dropbtn">Dropdown ⇩</a>
+        <div class="dropdown-content">
+            <a href="#">Link 1</a>
+            <a href="#">Link 2</a>
+            <a href="#">Link 3</a>
+        </div>
+    </li>
+    <li class="menu-item"><a href="#home">Home 2</a></li>
+
+    <li class="menu-item"><a href="#home">Home 3</a></li>
+
+</ul>
+
+<ul>
+    <li>Instructions
+        <ul>
+            <li>Press Tab to navigate through the menu items</li>
+            <li>Press Enter or Space to open a submenu</li>
+            <li>Press Escape to close a submenu or blur the active element</li>
+            <li>Press Arrow Up or Arrow Down to navigate through the submenu items</li>
+        </ul>
+        </li>
+
+</ul>
+
+<script>
+    let escapePressed = false;
+
+    document.addEventListener('keydown', function(event) {
+        const key = event.key; // "ArrowRight", "ArrowLeft", "ArrowUp", or "ArrowDown"
+        const activeElement = document.activeElement;
+
+        if (key === "Tab" && escapePressed) {
+            event.preventDefault();
+            const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+            const firstFocusableElement = document.querySelector(focusableElements);
+            firstFocusableElement.focus();
+            escapePressed = false;
+            return;
+        }
+
+        if (activeElement.classList.contains('dropbtn')) {
+            if (key === "Enter" || key === " ") {
+                let dropdownContent = activeElement.parentElement.querySelector('.dropdown-content');
+                dropdownContent.style.display = 'block';
+                dropdownContent.querySelector('a').focus();
+            } else if (key === "Escape") {
+                activeElement.blur();
+                escapePressed = true;
+            }
+        } else if (activeElement.parentElement.classList.contains('dropdown-content')) {
+            if (key === "Escape") {
+                activeElement.parentElement.style.display = 'none';
+                activeElement.parentElement.previousElementSibling.focus();
+                escapePressed = false; // Reset the flag as focus is now on the main menu
+            } else if (key === "ArrowDown") {
+                event.preventDefault();
+                let dropdownItems = Array.from(activeElement.parentElement.querySelectorAll('a'));
+                let currentIndex = dropdownItems.indexOf(activeElement);
+                if (currentIndex < dropdownItems.length - 1) {
+                    dropdownItems[currentIndex + 1].focus();
+                }
+            } else if (key === "ArrowUp") {
+                event.preventDefault();
+                let dropdownItems = Array.from(activeElement.parentElement.querySelectorAll('a'));
+                let currentIndex = dropdownItems.indexOf(activeElement);
+                if (currentIndex > 0) {
+                    dropdownItems[currentIndex - 1].focus();
+                }
+            }
+        } else if (key === "Escape") {
+            activeElement.blur();
+            escapePressed = true;
+        }
+    });
+
+    // Add blur event listener to each submenu
+    const submenus = document.querySelectorAll('.dropdown-content');
+    submenus.forEach(submenu => {
+        submenu.addEventListener('focusout', function(event) {
+            // Timeout is needed because relatedTarget (the element receiving focus) is not immediately available
+            setTimeout(() => {
+                if (!submenu.contains(document.activeElement)) {
+                    submenu.style.display = 'none';
+                }
+            }, 0);
+        });
+    });
+</script>
+
+</body>
+</html>
